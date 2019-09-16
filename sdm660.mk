@@ -27,14 +27,22 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/aosp_base_telephony.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/product_launched_with_o_mr1.mk)
 $(call inherit-product-if-exists, build/target/product/embedded.mk)
 
+# Enable updating of APEXes
+$(call inherit-product, $(SRC_TARGET_DIR)/product/updatable_apex.mk)
+
 # Inherit proprietary files
 $(call inherit-product, vendor/xiaomi/sdm660-common/sdm660-common-vendor.mk)
 $(call inherit-product-if-exists, vendor/xiaomi/MiuiCamera/config.mk)
+$(call inherit-product-if-exists, vendor/gapps/common/common-vendor.mk)
 
 COMMON_PATH := device/xiaomi/sdm660-common
 
 # Inherit properties
 $(call inherit-product, $(COMMON_PATH)/properties.mk)
+
+# Shims 
+PRODUCT_PACKAGES += \
+    camera.sdm660_shim
 
 # RRO
 PRODUCT_ENFORCE_RRO_TARGETS := \
@@ -43,6 +51,16 @@ PRODUCT_ENFORCE_RRO_TARGETS := \
 # Boot animation
 TARGET_BOOTANIMATION_SIZE := 1080p
 
+# GMS
+PRODUCT_GMS_CLIENTID_BASE := android-xiaomi
+
+# Set boot SPL
+BOOT_SECURITY_PATCH := $(PLATFORM_SECURITY_PATCH)
+
+# Soong
+PRODUCT_SOONG_NAMESPACES += \
+    $(COMMON_PATH)
+
 # Overlays
 DEVICE_PACKAGE_OVERLAYS += \
     $(COMMON_PATH)/overlay \
@@ -50,8 +68,8 @@ DEVICE_PACKAGE_OVERLAYS += \
 
 # Permissions
 PRODUCT_COPY_FILES += \
-    $(COMMON_PATH)/configs/privapp-permissions-qti.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/privapp-permissions-qti.xml \
-    $(COMMON_PATH)/configs/privapp-permissions-hotword.xml:system/etc/permissions/privapp-permissions-hotword.xml
+    $(COMMON_PATH)/configs/privapp-permissions-qti.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/permissions/privapp-permissions-qti.xml \
+    $(COMMON_PATH)/configs/privapp-permissions-hotword.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/permissions/privapp-permissions-hotword.xml
 
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.audio.low_latency.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.audio.low_latency.xml \
@@ -75,6 +93,7 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.sensor.stepdetector.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.stepdetector.xml \
     frameworks/native/data/etc/android.hardware.telephony.cdma.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.telephony.cdma.xml \
     frameworks/native/data/etc/android.hardware.telephony.gsm.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.telephony.gsm.xml \
+    frameworks/native/data/etc/android.hardware.telephony.ims.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.telephony.ims.xml \
     frameworks/native/data/etc/android.hardware.touchscreen.multitouch.jazzhand.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.touchscreen.multitouch.jazzhand.xml \
     frameworks/native/data/etc/android.hardware.usb.accessory.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.usb.accessory.xml \
     frameworks/native/data/etc/android.hardware.usb.host.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.usb.host.xml \
@@ -95,11 +114,11 @@ PRODUCT_COPY_FILES += \
 
 # Audio
 PRODUCT_PACKAGES += \
-    android.hardware.audio@4.0-impl:32 \
+    android.hardware.audio@5.0-impl:32 \
     android.hardware.audio@2.0-service \
-    android.hardware.audio.effect@4.0-impl:32 \
+    android.hardware.audio.effect@5.0-impl:32 \
     android.hardware.audio.effect@2.0-service \
-    android.hardware.soundtrigger@2.1-impl:32 \
+    android.hardware.soundtrigger@2.2-impl:32 \
     audio.a2dp.default \
     audio_amplifier.sdm660 \
     audio.primary.sdm660 \
@@ -154,6 +173,7 @@ PRODUCT_PACKAGES += \
     libbthost_if
 
 PRODUCT_PACKAGES += \
+    libMiWatermark_shim \
     Snap
 
 PRODUCT_PACKAGES += \
@@ -196,21 +216,14 @@ PRODUCT_PACKAGES += \
     vendor.display.config@1.1_vendor
 
 # Doze
-PRODUCT_PACKAGES += \
-    XiaomiDoze
+#PRODUCT_PACKAGES += \
+#    XiaomiDoze
 
 # DRM
 PRODUCT_PACKAGES += \
     android.hardware.drm@1.0-impl \
     android.hardware.drm@1.0-service \
-    android.hardware.drm@1.1-service.clearkey
-
-# FM
-PRODUCT_PACKAGES += \
-    FM2 \
-    libqcomfm_jni \
-    qcom.fmradio \
-    qcom.fmradio.xml
+    android.hardware.drm@1.2-service.clearkey
 
 PRODUCT_PACKAGES += \
     android.hardware.broadcastradio@1.0-impl
@@ -280,7 +293,6 @@ PRODUCT_COPY_FILES += \
 
 # Keylayout
 PRODUCT_COPY_FILES += \
-    $(COMMON_PATH)/configs/keylayout/sdm660-snd-card_Button_Jack.kl:$(TARGET_COPY_OUT_VENDOR)/usr/keylayout/sdm660-snd-card_Button_Jack.kl \
     $(COMMON_PATH)/configs/keylayout/uinput-fpc.kl:$(TARGET_COPY_OUT_VENDOR)/usr/keylayout/uinput-fpc.kl \
     $(COMMON_PATH)/configs/keylayout/uinput-goodix.kl:$(TARGET_COPY_OUT_VENDOR)/usr/keylayout/uinput-goodix.kl
 
@@ -335,6 +347,9 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     android.hardware.power@1.1-service-qti
 
+# Preopt SystemUI
+PRODUCT_DEXPREOPT_SPEED_APPS += SystemUI
+
 # Public Libraries
 PRODUCT_COPY_FILES += \
     $(COMMON_PATH)/configs/public.libraries.txt:$(TARGET_COPY_OUT_VENDOR)/etc/public.libraries.txt
@@ -347,6 +362,10 @@ PRODUCT_COPY_FILES += \
 # QMI
 PRODUCT_PACKAGES += \
     libjson
+
+# QTI Performance
+PRODUCT_COPY_FILES += \
+    $(COMMON_PATH)/configs/perf/perf-profile0.conf:$(TARGET_COPY_OUT_VENDOR)/etc/perf/perf-profile0.conf
 
 # RCS
 PRODUCT_PACKAGES += \
@@ -371,6 +390,9 @@ PRODUCT_PACKAGES += \
 
 PRODUCT_PACKAGES += \
     ims-ext-common \
+    ims_ext_common.xml \
+		qti-telephony-hidl-wrapper \
+		qti_telephony_hidl_wrapper.xml \
     telephony-ext
 
 PRODUCT_BOOT_JARS += \
@@ -427,7 +449,6 @@ PRODUCT_PACKAGES += \
     hostapd \
     libqsap_sdk \
     libwifi-hal-qcom \
-    wcnss_service \
     wpa_supplicant \
     wpa_supplicant.conf
 
@@ -446,4 +467,4 @@ PRODUCT_BOOT_JARS += \
 
 # XiaomiParts
 PRODUCT_PACKAGES += \
-    XiaomiParts
+   XiaomiParts
