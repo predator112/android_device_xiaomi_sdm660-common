@@ -22,48 +22,8 @@
 # definition file).
 #
 
+# Common Tree Path
 COMMON_PATH := device/xiaomi/sdm660-common
-
-BOARD_VENDOR := xiaomi
-
-# Bootloader
-TARGET_BOOTLOADER_BOARD_NAME := sdm660
-TARGET_NO_BOOTLOADER := true
-
-# Platform
-TARGET_BOARD_PLATFORM := sdm660
-TARGET_BOARD_PLATFORM_GPU := qcom-adreno512
-
-# Architecture
-TARGET_ARCH := arm64
-TARGET_ARCH_VARIANT := armv8-a
-TARGET_CPU_ABI := arm64-v8a
-TARGET_CPU_ABI2 :=
-TARGET_CPU_VARIANT := cortex-a73
-
-TARGET_2ND_ARCH := arm
-TARGET_2ND_ARCH_VARIANT := armv8-a
-TARGET_2ND_CPU_ABI := armeabi-v7a
-TARGET_2ND_CPU_ABI2 := armeabi
-TARGET_2ND_CPU_VARIANT := cortex-a73
-
-TARGET_USES_64_BIT_BINDER := true
-
-# Kernel
-BOARD_KERNEL_CMDLINE := console=ttyMSM0,115200,n8 androidboot.console=ttyMSM0 earlycon=msm_serial_dm,0xc170000 androidboot.hardware=qcom user_debug=31 msm_rtb.filter=0x37 ehci-hcd.park=3 lpm_levels.sleep_disabled=1 sched_enable_hmp=1 sched_enable_power_aware=1 service_locator.enable=1 swiotlb=1 androidboot.configfs=true androidboot.usbcontroller=a800000.dwc3
-BOARD_KERNEL_CMDLINE += loop.max_part=7
-BOARD_KERNEL_BASE := 0x00000000
-BOARD_KERNEL_PAGESIZE := 4096
-BOARD_KERNEL_TAGS_OFFSET := 0x01E00000
-BOARD_RAMDISK_OFFSET     := 0x02000000
-BOARD_KERNEL_IMAGE_NAME := Image.gz-dtb
-TARGET_KERNEL_ARCH := arm64
-TARGET_KERNEL_HEADER_ARCH := arm64
-TARGET_KERNEL_SOURCE := kernel/xiaomi/sdm660
-TARGET_KERNEL_CLANG_COMPILE := true
-
-# QCOM hardware
-BOARD_USES_QCOM_HARDWARE := true
 
 # ANT+
 BOARD_ANT_WIRELESS_DEVICE := "qualcomm-hidl"
@@ -71,105 +31,177 @@ BOARD_ANT_WIRELESS_DEVICE := "qualcomm-hidl"
 # APEX image
 DEXPREOPT_GENERATE_APEX_IMAGE := true
 
+# Architecture
+TARGET_ARCH := arm64
+TARGET_ARCH_VARIANT := armv8-a
+TARGET_CPU_ABI := arm64-v8a
+TARGET_CPU_ABI2 :=
+TARGET_CPU_VARIANT := kryo
+
+# Architecture 2
+TARGET_2ND_ARCH := arm
+TARGET_2ND_ARCH_VARIANT := armv8-a
+TARGET_2ND_CPU_ABI := armeabi-v7a
+TARGET_2ND_CPU_ABI2 := armeabi
+TARGET_2ND_CPU_VARIANT := kryo
+
 # Audio
 BOARD_USES_ALSA_AUDIO := true
 USE_CUSTOM_AUDIO_POLICY := 1
 USE_XML_AUDIO_POLICY_CONF := 1
-BOARD_SUPPORTS_SOUND_TRIGGER := true
-AUDIO_FEATURE_ENABLED_GEF_SUPPORT := true
-AUDIO_FEATURE_ENABLED_EXT_AMPLIFIER := false
+BOARD_SUPPORTS_SOUND_TRIGGER_HAL := true
+AUDIO_USE_DEEP_AS_PRIMARY_OUTPUT := false
+AUDIO_DISABLE_SWAP_CHANNELS := true
+
+# Binder
+TARGET_USES_64_BIT_BINDER := true
 
 # Bluetooth
+BOARD_HAVE_BLUETOOTH := true
 BOARD_HAVE_BLUETOOTH_QCOM := true
 BOARD_HAS_QCA_BT_SOC := "cherokee"
 BLUETOOTH_HCI_USE_MCT := true
 BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := $(COMMON_PATH)/bluetooth
 QCOM_BT_USE_BTNV := true
 QCOM_BT_USE_SMD_TTY := true
+TARGET_USE_QTI_BT_STACK := true
+
+# Bootloader
+TARGET_BOOTLOADER_BOARD_NAME := sdm660
+TARGET_NO_BOOTLOADER := true
+
+# Board
+TARGET_BOARD_PLATFORM := sdm660
+TARGET_BOARD_PLATFORM_GPU := qcom-adreno512
+BOARD_VENDOR := xiaomi
+
+# Build Rules
+BUILD_BROKEN_DUP_RULES := true
+BUILD_BROKEN_PHONY_TARGETS := true
 
 # Camera
+USE_DEVICE_SPECIFIC_CAMERA := true
 TARGET_USES_QTI_CAMERA_DEVICE := true
+TARGET_USES_QTI_CAMERA2CLIENT := true
+BOARD_QTI_CAMERA_32BIT_ONLY := true
+TARGET_USES_MEDIA_EXTENSIONS := true
 
 # Charger
 BOARD_CHARGER_ENABLE_SUSPEND := true
 BOARD_CHARGER_DISABLE_INIT_BLANK := true
+HEALTHD_USE_BATTERY_INFO := true
+
+# Clang
+TARGET_KERNEL_CLANG_COMPILE := true
+TARGET_KERNEL_CLANG_VERSION := r353983c
 
 # CNE and DPM
 BOARD_USES_QCNE := true
 
+# ConfigFS
+TARGET_FS_CONFIG_GEN := $(COMMON_PATH)/configs/config.fs
+
+# Crypto
+TARGET_HW_DISK_ENCRYPTION := true
+
 # Display
+BOARD_USES_ADRENO := true
 TARGET_USES_HWC2 := true
 TARGET_USES_GRALLOC1 := true
 TARGET_USES_ION := true
-TARGET_USES_NEW_ION_API :=true
-TARGET_USES_OVERLAY := true
-USE_OPENGL_RENDERER := true
-
-MAX_EGL_CACHE_KEY_SIZE := 12*1024
-MAX_EGL_CACHE_SIZE := 2048*1024
-
-OVERRIDE_RS_DRIVER := libRSDriver_adreno.so
 
 # DRM
 TARGET_ENABLE_MEDIADRM_64 := true
 
-# DT2W
-TARGET_TAP_TO_WAKE_NODE := "/sys/touchpanel/double_tap"
-
-# Enable dexpreopt to speed boot time
+# Dexpreopt
 ifeq ($(HOST_OS),linux)
   ifneq ($(TARGET_BUILD_VARIANT),eng)
     ifeq ($(WITH_DEXPREOPT),)
+			DONT_DEXPREOPT_PREBUILTS := true
       WITH_DEXPREOPT := true
       WITH_DEXPREOPT_BOOT_IMG_AND_SYSTEM_SERVER_ONLY := true
     endif
   endif
 endif
 
+# EXFAT
+TARGET_EXFAT_DRIVER := sdfat
+
 # FM
-ifeq ($(BOARD_HAVE_QCOM_FM),true)
 AUDIO_FEATURE_ENABLED_FM_POWER_OPT := true
-BOARD_HAS_QCA_FM_SOC := cherokee
-endif
+#BOARD_HAS_QCA_FM_SOC := cherokee
+# BOARD_HAVE_QCOM_FM := true
+# BOARD_HAVE_FM_RADIO := true
+# BOARD_DISABLE_FMRADIO_LIBJNI := true
 
 # GPS
-BOARD_VENDOR_QCOM_GPS_LOC_API_HARDWARE := default
-LOC_HIDL_VERSION := 3.0
+USE_DEVICE_SPECIFIC_GPS := true
+BOARD_VENDOR_QCOM_GPS_LOC_API_HARDWARE := $(TARGET_BOARD_PLATFORM)
 
 # HIDL
-DEVICE_FRAMEWORK_MANIFEST_FILE := $(COMMON_PATH)/configs/manifests/framework_manifest.xml
-DEVICE_MANIFEST_FILE := $(COMMON_PATH)/configs/manifests/manifest.xml
-DEVICE_MATRIX_FILE := $(COMMON_PATH)/configs/manifests/compatibility_matrix.xml
+DEVICE_FRAMEWORK_MANIFEST_FILE := $(COMMON_PATH)/framework_manifest.xml
+ifneq ($(filter lavender,$(TARGET_DEVICE)),)
+DEVICE_MANIFEST_FILE := $(shell sed 's/3.0/4.0/g' $(COMMON_PATH)/manifest.xml > manifest.xml && echo manifest.xml)
+else
+DEVICE_MANIFEST_FILE := $(COMMON_PATH)/manifest.xml
+endif
+DEVICE_MATRIX_FILE := $(COMMON_PATH)/compatibility_matrix.xml
+
+# HWUI
+HWUI_COMPILE_FOR_PERF := true
 
 # Init
 TARGET_INIT_VENDOR_LIB := //$(COMMON_PATH):libinit_sdm660
+TARGET_PLATFORM_DEVICE_BASE := /devices/soc/
 TARGET_RECOVERY_DEVICE_MODULES := libinit_sdm660
 
-# Keystore
+# IPA
+USE_DEVICE_SPECIFIC_DATA_IPA_CFG_MGR := true
+USE_DEVICE_SPECIFIC_IPACFG_MGR := true
+
+# Kernel
+BOARD_KERNEL_CMDLINE := console=ttyMSM0,115200,n8 androidboot.console=ttyMSM0 earlycon=msm_serial_dm,0xc170000 androidboot.hardware=qcom user_debug=31 msm_rtb.filter=0x37 ehci-hcd.park=3 lpm_levels.sleep_disabled=1 sched_enable_hmp=1 sched_enable_power_aware=1 service_locator.enable=1 swiotlb=1 androidboot.configfs=true androidboot.usbcontroller=a800000.dwc3
+BOARD_KERNEL_CMDLINE += loop.max_part=7
+BOARD_KERNEL_BASE := 0x00000000
+BOARD_KERNEL_PAGESIZE := 4096
+BOARD_KERNEL_TAGS_OFFSET := 0x00000100
+BOARD_RAMDISK_OFFSET     := 0x01000000
+BOARD_KERNEL_IMAGE_NAME := Image.gz-dtb
+TARGET_KERNEL_ARCH := arm64
+TARGET_KERNEL_HEADER_ARCH := arm64
+TARGET_KERNEL_VERSION := 4.4
+
+# Keymaster
 TARGET_PROVIDES_KEYMASTER := true
 
 # Partitions
-BOARD_FLASH_BLOCK_SIZE := 131072 # (BOARD_KERNEL_PAGESIZE * 64)
-BOARD_BOOTIMAGE_PARTITION_SIZE := 0x04000000
+BOARD_FLASH_BLOCK_SIZE := 262144
+BOARD_BOOTIMAGE_PARTITION_SIZE := 67108864
 ifneq ($(AB_OTA_UPDATER), true)
 BOARD_CACHEIMAGE_FILE_SYSTEM_TYPE := ext4
 BOARD_CACHEIMAGE_PARTITION_SIZE := 268435456
-BOARD_RECOVERYIMAGE_PARTITION_SIZE := 0x04000000
+BOARD_RECOVERYIMAGE_PARTITION_SIZE := 67108864
 endif
 BOARD_SYSTEMIMAGE_PARTITION_TYPE := ext4
+BOARD_SYSTEMIMAGE_PARTITION_SIZE := 3221225472
+BOARD_VENDORIMAGE_PARTITION_SIZE := 2147483648
 BOARD_VENDORIMAGE_FILE_SYSTEM_TYPE := ext4
+TARGET_USERIMAGES_USE_EXT4 := true
+TARGET_USERIMAGES_USE_F2FS := true
 
+# Extra Symlink
 BOARD_ROOT_EXTRA_SYMLINKS := \
     /vendor/dsp:/dsp \
     /vendor/firmware_mnt:/firmware \
     /vendor/bt_firmware:/bt_firmware \
     /mnt/vendor/persist:/persist
 
+# Directory
+TARGET_COPY_OUT_PRODUCT := system/product
 TARGET_COPY_OUT_VENDOR := vendor
-TARGET_USERIMAGES_USE_EXT4 := true
-TARGET_USERIMAGES_USE_F2FS := true
 
-TARGET_FS_CONFIG_GEN := $(COMMON_PATH)/config.fs
+# Peripheral manager
+TARGET_PER_MGR_ENABLED := true
 
 # Power
 TARGET_USES_INTERACTION_BOOST := true
@@ -177,11 +209,30 @@ TARGET_USES_INTERACTION_BOOST := true
 # Properties
 BOARD_PROPERTY_OVERRIDES_SPLIT_ENABLED := true
 
+# QCOM hardware
+BOARD_USES_QCOM_HARDWARE := true
+TARGET_USES_QCOM_BSP := false
+
 # Recovery
+ifneq ($(filter lavender,$(TARGET_DEVICE)),)
+TARGET_RECOVERY_FSTAB := $(COMMON_PATH)/rootdir/etc/fstab_A.qcom
+else ifeq ($(AB_OTA_UPDATER), true)
+TARGET_RECOVERY_FSTAB := $(COMMON_PATH)/rootdir/etc/fstab_AB.qcom
+else
+TARGET_RECOVERY_FSTAB := $(COMMON_PATH)/rootdir/etc/fstab.qcom
+endif
 BOARD_HAS_LARGE_FILESYSTEM := true
 
+# Renderscript
+OVERRIDE_RS_DRIVER := libRSDriver_adreno.so
+
 # RIL
+PROTOBUF_SUPPORTED := true
 TARGET_PROVIDES_QTI_TELEPHONY_JAR := true
+TARGET_USES_ALTERNATIVE_MANUAL_NETWORK_SELECT := true
+
+# SDCLANG
+TARGET_USE_SDCLANG := true
 
 # SELinux
 include device/qcom/sepolicy-legacy-um/sepolicy.mk
@@ -192,21 +243,33 @@ BOARD_PLAT_PRIVATE_SEPOLICY_DIR += $(COMMON_PATH)/sepolicy/private
 # Treble
 PRODUCT_FULL_TREBLE_OVERRIDE := true
 PRODUCT_VENDOR_MOVE_ENABLED := true
+
+# Timeservice
+BOARD_USES_QC_TIME_SERVICES := true
+
+# Use mke2fs to create ext4 images
+TARGET_USES_MKE2FS := true
+
+# VNDK
 BOARD_VNDK_VERSION := current
+PRODUCT_EXTRA_VNDK_VERSIONS := 28
 
 # Wifi
+BOARD_USES_AOSP_WLAN_HAL := true
 BOARD_HAS_QCOM_WLAN := true
 BOARD_WLAN_DEVICE := qcwcn
 BOARD_HOSTAPD_DRIVER := NL80211
 BOARD_HOSTAPD_PRIVATE_LIB := lib_driver_cmd_$(BOARD_WLAN_DEVICE)
 BOARD_WPA_SUPPLICANT_DRIVER := NL80211
 BOARD_WPA_SUPPLICANT_PRIVATE_LIB := lib_driver_cmd_$(BOARD_WLAN_DEVICE)
+QC_WIFI_HIDL_FEATURE_DUAL_AP := true
 WIFI_DRIVER_FW_PATH_AP := "ap"
 WIFI_DRIVER_FW_PATH_STA := "sta"
 WIFI_DRIVER_FW_PATH_P2P := "p2p"
 WIFI_DRIVER_OPERSTATE_PATH := "/sys/class/net/wlan0/operstate"
 WIFI_HIDL_FEATURE_DUAL_INTERFACE := true
+WIFI_HIDL_FEATURE_AWARE := true
 WPA_SUPPLICANT_VERSION := VER_0_8_X
 
 # Inherit the proprietary files
-include vendor/xiaomi/sdm660-common/BoardConfigVendor.mk
+-include vendor/xiaomi/sdm660-common/BoardConfigVendor.mk
