@@ -81,7 +81,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.config.media_vol_steps=25 \
     ro.config.vc_call_vol_steps=7 \
-    vendor.audio.adm.buffering.ms=6
+    vendor.audio.adm.buffering.ms=12
 
 # Bluetooth
 PRODUCT_PROPERTY_OVERRIDES += \
@@ -122,7 +122,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
     ro.surface_flinger.vsync_sf_event_phase_offset_ns=6000000 \
     ro.vendor.display.cabl=0 \
     vendor.display.disable_skip_validate=1 \
-    vendor.display.enable_default_color_mode=1 \
+    vendor.display.enable_default_color_mode=0 \
     vendor.gralloc.enable_fb_ubwc=1
 
 # FRP
