@@ -145,7 +145,7 @@ PRODUCT_BOOT_JARS += \
     org.ifaa.android.manager
 
 # Camera
-PRODUCT_PACKAGES += \
+#PRODUCT_PACKAGES += \
     Snap
 
 PRODUCT_PACKAGES += \
